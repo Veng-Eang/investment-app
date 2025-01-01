@@ -1,5 +1,8 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { InvestmentInput } from './../investment-input.model';
+import { Component, EventEmitter, inject, Output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { single } from 'rxjs';
+import { InvestmentService } from '../investment.service';
 
 @Component({
   selector: 'app-user-input',
@@ -8,18 +11,20 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './user-input.component.css'
 })
 export class UserInputComponent {
-  @Output()
-  calculate = new EventEmitter();
-  intitialValue = '0';
-  annualValue = '0';
-  expectedValue = '5';
-  durationValue = '0';
+  investmentService = inject(InvestmentService);
+  intitialValue = signal('0');
+  annualValue = signal('0');
+  expectedValue = signal('5');
+  durationValue = signal('10');
 
   onSubmit() {
-    console.log("Submit button clicked");
-    console.log("Initial Value: " + this.intitialValue);
-    console.log("Annual Value: " + this.annualValue);
-    console.log("Expected Value: " + this.expectedValue);
-    console.log("Duration Value: " + this.durationValue);
+    const investmentInput: InvestmentInput = {
+      initialInvestment: parseFloat(this.intitialValue()),
+      annualInvestment: parseFloat(this.annualValue()),
+      expectedReturn: parseFloat(this.expectedValue()),
+      duration: parseFloat(this.durationValue())
+    };
+    this.investmentService.onCalculateInvestmentResults(investmentInput);
   }
+
 }
